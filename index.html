@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Name Letter Counter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@400;500&display=swap">
+<style>
+  /* Layout: one centered card; input on top, big count below, letter tiles underneath */
+  :root {
+    --bg: #f3f5f8;
+    --surface: #ffffff;
+    --fg: #1b2130;
+    --muted: #5d6679;
+    --line: #d9dee8;
+    --accent: #2f5bd3;
+    --tile: #e7edfb;
+    --font-display: "Fraunces", Georgia, serif;
+    --font-body: "Work Sans", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11141b; --surface: #1a1f2a; --fg: #e8ebf2; --muted: #9aa3b5;
+      --line: #2c3342; --accent: #86a6ff; --tile: #243050; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11141b; --surface: #1a1f2a; --fg: #e8ebf2; --muted: #9aa3b5;
+    --line: #2c3342; --accent: #86a6ff; --tile: #243050; color-scheme: dark;
+  }
+  body {
+    background: var(--bg); color: var(--fg); font-family: var(--font-body);
+    font-size: 16px; padding: 48px 16px; box-sizing: border-box;
+  }
+  .card {
+    max-width: 480px; margin: 0 auto; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 14px; padding: 28px;
+    display: grid; gap: 20px;
+  }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: 1.75rem; margin: 0; text-wrap: balance; }
+  label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); display: block; margin-bottom: 6px; }
+  input {
+    width: 100%; box-sizing: border-box; font: inherit; font-size: 1.1rem; color: var(--fg);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px;
+  }
+  input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  .result { display: flex; align-items: baseline; gap: 10px; }
+  .count { font-family: var(--font-display); font-size: 4rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .unit { color: var(--muted); }
+  .tiles { display: flex; flex-wrap: wrap; gap: 6px; min-height: 34px; }
+  .tile {
+    background: var(--tile); color: var(--fg); border-radius: 6px; min-width: 30px; height: 34px;
+    display: grid; place-items: center; font-weight: 500; position: relative; padding: 0 4px; box-sizing: border-box;
+  }
+  .tile sup { position: absolute; top: 2px; right: 3px; font-size: 0.55rem; color: var(--muted); }
+  .note { font-size: 0.85rem; color: var(--muted); margin: 0; }
+</style>
+</head>
+<body>
+
+<main class="card">
+  <h1>How many letters are in your name?</h1>
+  <div>
+    <label for="name">Name</label>
+    <input id="name" type="text" value="Ada Lovelace" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="result" aria-live="polite">
+    <span class="count" id="count">0</span>
+    <span class="unit" id="unit">letters</span>
+  </div>
+  <div class="tiles" id="tiles"></div>
+  <p class="note">Only letters count. Spaces, hyphens, apostrophes and numbers are skipped.</p>
+</main>
+
+<script>
+  const input = document.getElementById('name');
+  const countEl = document.getElementById('count');
+  const unitEl = document.getElementById('unit');
+  const tilesEl = document.getElementById('tiles');
+
+  function update() {
+    const letters = input.value.match(/\p{L}/gu) || [];
+    countEl.textContent = letters.length;
+    unitEl.textContent = letters.length === 1 ? 'letter' : 'letters';
+    tilesEl.replaceChildren(...letters.map((ch, i) => {
+      const t = document.createElement('span');
+      t.className = 'tile';
+      t.textContent = ch;
+      const n = document.createElement('sup');
+      n.textContent = i + 1;
+      t.appendChild(n);
+      return t;
+    }));
+  }
+
+  input.addEventListener('input', update);
+  update();
+</script>
+</body>
+</html>
